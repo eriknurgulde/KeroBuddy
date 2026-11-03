@@ -15,7 +15,7 @@ class OLED {
     this.ink = new Uint8Array(W * H);         // color index per lit pixel (color mode)
     this.color_ = 0;                          // current ink
     this.cx = 0; this.cy = 0; this.size = 1; this.color = WHITE;
-    this.inverted = false; this.dimmed = false;
+    this.inverted = false;
   }
   clear() { this.buf.fill(0); this.ink.fill(0); }
   px(x, y, c) {
@@ -691,14 +691,12 @@ function updateAndDrawMascot(now) {
 const canvas = document.getElementById("oled");
 const ctx = canvas.getContext("2d");
 const img = ctx.createImageData(W, H);
-const ON = [228, 240, 255], ON_DIM = [110, 118, 128];
+const ON = [228, 240, 255];
 
 function present() {
-  const on = display.dimmed ? ON_DIM : ON;
-  const k = display.dimmed ? 0.5 : 1;
   for (let i = 0; i < W * H; i++) {
     const lit = display.buf[i] ^ (display.inverted ? 1 : 0);
-    const c = !lit ? null : (CFG.color && display.buf[i]) ? PALETTE[display.ink[i]].map(v => v * k) : on;
+    const c = !lit ? null : (CFG.color && display.buf[i]) ? PALETTE[display.ink[i]] : ON;
     const o = i * 4;
     img.data[o] = c ? c[0] : 0;
     img.data[o + 1] = c ? c[1] : 0;
@@ -712,7 +710,6 @@ function frame() {
   const now = millis();
   handleInput(now);
   nowTm = new Date();
-  display.dimmed = isNight();
   display.clear();
   ink(INK_WHITE);
   updateTimers(now);

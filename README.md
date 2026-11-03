@@ -64,7 +64,7 @@ Copy `config.example.json` to `config.json` and change what you like. Every fiel
 | `break_every` | 50 | minutes of screen time before `Stretch!` |
 | `away_minutes` | 5 | no input this long = you're away, Kero naps. A pause of `break_minutes` counts as a break |
 | `hour_chime` | true | croak on the hour |
-| `night_start`, `night_end` | 23, 7 | dim screen, sleepy frog |
+| `night_start`, `night_end` | 23, 7 | night hours: Kero dozes off sooner and skips the hour chime |
 | `color` | true | false = single color, like a real OLED |
 | `corner` | bottom-right | `bottom-right`, `bottom-left`, `top-right`, `top-left` |
 | `scale`, `margin`, `margin_top` | 3, 12, = margin | window size (128×64 × scale) and the gap to the screen edge |
