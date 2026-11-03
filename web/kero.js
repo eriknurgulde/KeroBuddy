@@ -247,7 +247,15 @@ function textAt(x, y, size, s) { display.setTextSize(size); display.setCursor(x,
 function textRight(rx, y, size, s) { textAt(rx - s.length * 6 * size, y, size, s); }
 function fmtMins(m) { return m < 60 ? m + "m" : Math.floor(m / 60) + "h" + pad2(m % 60); }
 
-function say(text, ms) { bubble = { text, until: millis() + ms }; }
+function say(text, ms) { bubble = { text, until: millis() + ms }; makeRoomFor(text); }
+// Kero stands in the middle and the bubble fits on neither side: hop to an edge first.
+function makeRoomFor(text) {
+  const w = text.length * 6 + 7;
+  if (kx + KW + 4 + w > W && kx - w - 7 < 0) {
+    hopS = { phase: "none" };
+    startHop(kx < (X_MIN + X_MAX) / 2 ? X_MIN - kx : X_MAX - kx, 8);
+  }
+}
 
 // =====================================================================
 //                           KERO ACTIONS
@@ -325,7 +333,7 @@ function updateTimers(now) {
   const t = Date.now();
   if (focus.mode === "focus" && t >= focus.endsAt) {
     focus = { mode: "break", total: CFG.break_minutes * 60000, endsAt: t + CFG.break_minutes * 60000 };
-    alert = { kind: "focus", text: "Done!", since: now };
+    alert = { kind: "focus", text: "Done!", since: now }; makeRoomFor(alert.text);
     flashUntil = now + 1200;
     startFly(1800);
   } else if (focus.mode === "break" && t >= focus.endsAt) {
@@ -341,7 +349,7 @@ function updateTimers(now) {
   }
   if (sys.ok && !alert && focus.mode === "off" && !quiet() && t > snoozeUntil &&
       t - activeSince >= CFG.break_every * 60000) {
-    alert = { kind: "break", text: "Stretch!", since: now };
+    alert = { kind: "break", text: "Stretch!", since: now }; makeRoomFor(alert.text);
     flashUntil = now + 1200;
     switchCard(C_SCREEN, now); holdUntil = now + 20000;
   }
@@ -522,7 +530,7 @@ function drawSideBubble(ox, oy, txt) {
   const w = txt.length * 6 + 7, h = 11;
   const y = Math.max(BAND_H + 2, oy - 4);
   let x = ox + KW + 4;
-  if (x + w > W) x = ox - w - 4;
+  if (x + w > W) x = ox - w - 7;
   x = Math.max(0, x);
   display.fillRoundRect(x, y, w, h, 3, BLACK);
   display.drawRoundRect(x, y, w, h, 3, WHITE);
@@ -534,12 +542,15 @@ function drawHeart(x, y) {
   display.fillCircle(x + 2, y, 2, WHITE);
   display.fillTriangle(x - 4, y + 1, x + 4, y + 1, x, y + 5, WHITE);
 }
+// x for a little effect `dx` px beside Kero (right side if it fits, else mirrored to the left)
+const besideX = (ox, dx, w) => (ox + KW + dx + w <= W ? ox + KW + dx : ox - dx - w);
 function drawZz(ox, oy, now) {
   ink(INK_CYAN);
-  const p = Math.trunc(now / 140) % 16;
-  textAt(Math.min(ox + KW + 2 + Math.trunc(p / 4), W - 6), oy + 4 - Math.trunc(p / 3), 1, "z");
-  const q = (p + 8) % 16;
-  textAt(Math.min(ox + KW + 6 + Math.trunc(q / 4), W - 6), oy + 1 - Math.trunc(q / 3), 1, "Z");
+  const p = Math.trunc(now / 140) % 16, q = (p + 8) % 16;
+  const right = ox + KW + 18 <= W;
+  const zx = d => (right ? ox + KW + d : ox - d - 5);
+  textAt(zx(2 + Math.trunc(p / 4)), oy + 4 - Math.trunc(p / 3), 1, "z");
+  textAt(zx(6 + Math.trunc(q / 4)), oy + 1 - Math.trunc(q / 3), 1, "Z");
 }
 function drawNote(x, y) {
   ink(INK_CYAN);
@@ -548,7 +559,7 @@ function drawNote(x, y) {
 }
 function drawSweat(ox, oy, now) {
   ink(INK_BLUE);
-  const x = ox + KW + 2, y = oy + 1 + Math.trunc(now / 90) % 8;
+  const x = besideX(ox, 2, 2) + 1, y = oy + 1 + Math.trunc(now / 90) % 8;
   display.fillCircle(x, y, 1, WHITE);
   display.px(x, y - 2, WHITE);
 }
@@ -677,7 +688,7 @@ function updateAndDrawMascot(now) {
 
   drawKero(ox, oy, { b, crouch, swell, eyes, lx: sleeping ? 0 : lookX, air, tongue });
 
-  if (croakP >= 0.2 && croakP < 1.6) drawNote(ox + KW + 3 + Math.round(croakP * 4), oy + 2 - Math.round(croakP * 8));
+  if (croakP >= 0.2 && croakP < 1.6) drawNote(besideX(ox, 3 + Math.round(croakP * 4), 5), oy + 2 - Math.round(croakP * 8));
   if (sweaty && !sleeping) drawSweat(ox, oy, now);
   if (sleeping) drawZz(ox, oy, now);
   if (petting) drawHeart(ox + KW / 2, Math.max(BAND_H + 4, oy - 6 - Math.trunc(now / 150) % 3));

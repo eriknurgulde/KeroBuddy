@@ -2,6 +2,16 @@
 
 A tiny pixel frog that lives in the corner of your screen, always on top. Kero shows the **time and weather**, **air quality**, how your **PC** is doing and your **screen time**. It runs a **focus timer** and reminds you to **stretch**. No accounts and no AI needed, and nothing leaves your computer.
 
+<p align="center">
+  <img src="docs/kerobuddy.gif" alt="KeroBuddy saying Ribbit, cycling through the time, air quality and PC cards, catching a fly, running a focus timer, celebrating Done, asking you to stretch, dancing in the rain, sweating at high CPU, being petted and falling asleep" width="540">
+</p>
+
+<p align="center">
+  <img src="docs/mono-vs-color.png" alt="The same four screens in single color (top) and in color (bottom)">
+</p>
+
+Prefer the look of a real OLED? Set `"color": false` ([single-color preview](docs/kerobuddy-mono.gif)).
+
 ## What it shows
 
 An **info card** on top (slides to the next card every few seconds) and Kero's little world below.
