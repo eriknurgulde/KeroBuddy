@@ -1,0 +1,7 @@
+{
+  "latitude": 43.2295, "longitude": 76.8374,
+  "focus_minutes": 25, "break_minutes": 5, "break_every": 50,
+  "away_minutes": 5, "hour_chime": true,
+  "night_start": 23, "night_end": 7, "color": true,
+  "corner": "bottom-right", "scale": 3, "margin": 12
+}
